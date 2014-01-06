@@ -38,6 +38,26 @@ Using werkzeug, for example, you might do::
         )
 
 
+To do more than just mapping the name to an address, you can specify
+callables::
+
+    def lookup_user(domain, user):
+         ripple, destination_tag = findUser(domain, user)
+         return {
+            'destination_address': app.config['PAYMENT_ADDRESS'],
+            'dt': int(user)
+         }
+
+    federation = Federation({
+        'elsdoerfer.name': lookup_user,
+        'elsdoerfer.name': {'michael': callable_allowed_here_as_well},
+    })
+
+
+The callable has to return a dict, which will be inserted into the result record,
+and may also overwrite the standard fields. In this way, you may provide any
+return values the Federation specification allows.
+
 
 Other notes
 -----------
