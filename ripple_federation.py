@@ -1,16 +1,15 @@
 import textwrap
 
 
-def get_ripple_txt(domain, federation_url):
+def get_ripple_txt(domain, federation_url, accounts=[]):
     """Return contents of a ripple.txt linking to the mapping endpoint.
     """
-    return textwrap.dedent("""
-    [domain]
-    {domain}
-
-    [federation_url]
-    {federation_url}
-    """.format(federation_url=federation_url, domain=domain)).strip()
+    result = []
+    result.append('[domain]\n{}'.format(domain))
+    result.append('[federation_url]\n{}'.format(federation_url))
+    if accounts:
+        result.append('[accounts]\n{}'.format('\n'.join(accounts)))
+    return '\n\n'.join(result)
 
 
 class Federation(object):
