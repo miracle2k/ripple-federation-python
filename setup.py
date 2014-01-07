@@ -7,7 +7,7 @@ setup(
     description="Map email to Ripple addresses using the Federation protocol",
     author='Michael Elsdörfer',
     author_email='michael@elsdoerfer.com',
-    version="1.1",
+    version="1.1.1",
     url="https://github.com/miracle2k/ripple-federation-python",
     license='BSD',
     py_modules=['ripple_federation'],
