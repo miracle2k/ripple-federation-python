@@ -1,7 +1,7 @@
 import textwrap
 
 
-def get_ripple_txt(domain, federation_url, accounts=[]):
+def get_ripple_txt(domain, federation_url, accounts=[], **kwargs):
     """Return contents of a ripple.txt linking to the mapping endpoint.
     """
     result = []
@@ -9,6 +9,8 @@ def get_ripple_txt(domain, federation_url, accounts=[]):
     result.append('[federation_url]\n{}'.format(federation_url))
     if accounts:
         result.append('[accounts]\n{}'.format('\n'.join(accounts)))
+    for key, values in kwargs.items():
+        result.append('[{}]\n{}'.format(key, '\n'.join(values)))
     return '\n\n'.join(result)
 
 
