@@ -78,9 +78,10 @@ class Federation(object):
             'federation_json': record
         }
 
-    def error(self, code, msg=None):
+    @classmethod
+    def error(cls, code, msg=None):
         return {
             'result': 'error',
             'error': code,
-            'error_message': msg or self.errors.get(code)
+            'error_message': msg or cls.errors.get(code)
         }
