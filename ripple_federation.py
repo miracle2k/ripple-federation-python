@@ -54,6 +54,8 @@ class Federation(object):
         if callable(self.userdb[domain]):
             # A callable was given for the whole domain
             data = self.userdb[domain](domain, user)
+        elif isinstance(self.userdb[domain], dict):
+            data = self.userdb[domain]
         else:
             # Make sure a record exists for the user
             if not user in self.userdb[domain]:
