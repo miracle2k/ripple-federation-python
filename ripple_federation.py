@@ -1,6 +1,3 @@
-import textwrap
-
-
 def get_ripple_txt(domain, federation_url, accounts=[], **kwargs):
     """Return contents of a ripple.txt linking to the mapping endpoint.
     """
@@ -12,6 +9,15 @@ def get_ripple_txt(domain, federation_url, accounts=[], **kwargs):
     for key, values in kwargs.items():
         result.append('[{}]\n{}'.format(key, '\n'.join(values)))
     return '\n\n'.join(result)
+
+
+class FederationError(Exception):
+    """Something a callback would raise if an error should be
+    communicated to the user.
+    """
+    def __init__(self, code, message=None):
+        self.code = code
+        self.message = message
 
 
 class Federation(object):
@@ -51,21 +57,24 @@ class Federation(object):
         if not domain in self.userdb:
             return self.error('noSuchDomain')
 
-        if callable(self.userdb[domain]):
-            # A callable was given for the whole domain
-            data = self.userdb[domain](domain, user)
-        elif isinstance(self.userdb[domain], dict):
-            data = self.userdb[domain]
-        else:
-            # Make sure a record exists for the user
-            if not user in self.userdb[domain]:
-                return self.error('noSuchUser')
-
-            # User can either be a callable, or a destination address
-            if callable(self.userdb[domain][user]):
-                data = self.userdb[domain][user](domain, user)
+        try:
+            if callable(self.userdb[domain]):
+                # A callable was given for the whole domain
+                data = self.userdb[domain](domain, user)
+            elif isinstance(self.userdb[domain], dict):
+                data = self.userdb[domain]
             else:
-                data = {'destination_address': self.userdb[domain][user]}
+                # Make sure a record exists for the user
+                if not user in self.userdb[domain]:
+                    return self.error('noSuchUser')
+
+                # User can either be a callable, or a destination address
+                if callable(self.userdb[domain][user]):
+                    data = self.userdb[domain][user](domain, user)
+                else:
+                    data = {'destination_address': self.userdb[domain][user]}
+        except FederationError as e:
+            return self.error(e.code, e.message)
 
         record = {
             'type': 'federation_record',
