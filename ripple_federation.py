@@ -47,13 +47,10 @@ class Federation(object):
         Returns a JSON-serializable structure.
         """
         domain = GET.get('domain', '').lower()
-        user = GET.get('destination', GET.get('user'))
+        user = GET.get('destination', GET.get('user', ''))
 
         if not domain:
             return self.error('invalidParams', 'No domain provided.')
-        if not user:
-            return self.error('invalidParams', 'No username provided.')
-
         if not domain in self.userdb:
             return self.error('noSuchDomain')
 
@@ -65,6 +62,8 @@ class Federation(object):
                 data = self.userdb[domain]
             else:
                 # Make sure a record exists for the user
+                if not user:
+                    return self.error('invalidParams', 'No username provided.')
                 if not user in self.userdb[domain]:
                     return self.error('noSuchUser')
 
@@ -78,10 +77,15 @@ class Federation(object):
 
         record = {
             'type': 'federation_record',
-            'destination': user,
-            'user': user,   # deprecated
             'domain': domain
         }
+        # Allowing federation requests w/o users is a bit of a
+        # non-standard extension, I think, but useful.
+        if user:
+            record.update({
+                'destination': user,
+                'user': user,   # deprecated
+            })
         record.update(data)
         return {
             'federation_json': record
